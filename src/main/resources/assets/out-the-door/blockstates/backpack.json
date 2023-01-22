@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "out-the-door:block/backpack",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "out-the-door:block/backpack",
+      "y": -90
+    },
+    "facing=west": {
+      "model": "out-the-door:block/backpack"
+    },
+    "facing=east": {
+      "model": "out-the-door:block/backpack",
+      "y": 180
+    }
+  }
+}

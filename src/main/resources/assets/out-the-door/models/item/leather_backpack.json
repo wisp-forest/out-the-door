@@ -1,0 +1,7 @@
+{
+  "parent": "out-the-door:item/backpack",
+  "textures": {
+    "1": "out-the-door:item/leather_backpack",
+    "particle": "out-the-door:item/leather_backpack"
+  }
+}
