@@ -4,5 +4,6 @@ import net.minecraft.util.Identifier;
 
 public interface BackpackType {
     String name();
+
     Identifier model();
 }

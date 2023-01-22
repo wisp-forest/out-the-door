@@ -1,7 +1,6 @@
 package io.wispforest.outthedoor.client;
 
 import io.wispforest.outthedoor.OutTheDoor;
-import io.wispforest.outthedoor.client.model.BackpackModel;
 import io.wispforest.outthedoor.client.model.BackpackUnbakedModel;
 import io.wispforest.outthedoor.object.OutTheDoorBlocks;
 import net.fabricmc.api.ClientModInitializer;
