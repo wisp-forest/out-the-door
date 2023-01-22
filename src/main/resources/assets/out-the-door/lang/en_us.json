@@ -3,5 +3,7 @@
 
   "item.out-the-door.leather_backpack": "Leather Backpack",
   "item.out-the-door.hide_backpack": "Hide Backpack",
-  "item.out-the-door.pumpkin_backpack": "Pumpkin Backpack"
+  "item.out-the-door.pumpkin_backpack": "Pumpkin Backpack",
+
+  "key.out-the-door.openBackpack": "Open Backpack"
 }

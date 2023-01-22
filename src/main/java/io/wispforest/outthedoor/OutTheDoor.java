@@ -6,6 +6,7 @@ import io.wispforest.outthedoor.object.OutTheDoorBlocks;
 import io.wispforest.outthedoor.object.OutTheDoorItems;
 import io.wispforest.owo.itemgroup.Icon;
 import io.wispforest.owo.itemgroup.OwoItemGroup;
+import io.wispforest.owo.network.OwoNetChannel;
 import io.wispforest.owo.registration.reflect.FieldRegistrationHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
@@ -16,6 +17,8 @@ import net.minecraft.util.Identifier;
 public class OutTheDoor implements ModInitializer {
 
     public static final String MOD_ID = "out-the-door";
+
+    public static final OwoNetChannel CHANNEL = OwoNetChannel.create(id("network"));
 
     public static final OwoItemGroup GROUP = OwoItemGroup
             .builder(id("out-the-door"), () -> Icon.of(OutTheDoorItems.LEATHER_BACKPACK))

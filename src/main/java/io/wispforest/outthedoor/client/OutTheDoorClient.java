@@ -5,22 +5,31 @@ import dev.emi.trinkets.api.client.TrinketRendererRegistry;
 import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.client.model.BackpackUnbakedModel;
 import io.wispforest.outthedoor.item.BackpackItem;
+import io.wispforest.outthedoor.misc.OpenTrinketBackpackPacket;
 import io.wispforest.outthedoor.object.OutTheDoorBlocks;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.util.math.RotationAxis;
+import org.lwjgl.glfw.GLFW;
 
 @Environment(EnvType.CLIENT)
 public class OutTheDoorClient implements ClientModInitializer {
+
+    public static final KeyBinding OPEN_BACKPACK = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            "key.out-the-door.openBackpack", GLFW.GLFW_KEY_B, "key.categories.inventory"
+    ));
 
     @Override
     public void onInitializeClient() {
@@ -32,6 +41,13 @@ public class OutTheDoorClient implements ClientModInitializer {
             } else {
                 return null;
             }
+        });
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            boolean openScreen = false;
+            while (OPEN_BACKPACK.wasPressed()) openScreen = true;
+
+            if (openScreen) OutTheDoor.CHANNEL.clientHandle().send(new OpenTrinketBackpackPacket());
         });
 
         for (var backpack : BackpackItem.getAll()) {

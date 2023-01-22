@@ -1,8 +1,10 @@
 package io.wispforest.outthedoor.item;
 
+import dev.emi.trinkets.api.TrinketsApi;
 import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.block.BackpackBlockEntity;
 import io.wispforest.outthedoor.misc.BackpackType;
+import io.wispforest.outthedoor.misc.OpenTrinketBackpackPacket;
 import io.wispforest.outthedoor.object.OutTheDoorBlocks;
 import io.wispforest.owo.itemgroup.OwoItemSettings;
 import io.wispforest.owo.nbt.NbtKey;
@@ -125,5 +127,17 @@ public class BackpackItem extends BlockItem {
 
     public static Collection<BackpackItem> getAll() {
         return Collections.unmodifiableCollection(KNOWN_BACKPACK_ITEMS.values());
+    }
+
+    static {
+        OutTheDoor.CHANNEL.registerServerbound(OpenTrinketBackpackPacket.class, (message, access) -> {
+            TrinketsApi.getTrinketComponent(access.player()).ifPresent(trinkets -> {
+                var backpacks = trinkets.getEquipped(stack -> stack.getItem() instanceof BackpackItem);
+                if (backpacks.isEmpty()) return;
+
+                var backpackStack = backpacks.get(0).getRight();
+                ((BackpackItem) backpackStack.getItem()).openScreen(backpackStack, access.player());
+            });
+        });
     }
 }
