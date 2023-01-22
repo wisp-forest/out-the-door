@@ -6,4 +6,6 @@ public interface BackpackType {
     String name();
 
     Identifier model();
+
+    int slots();
 }
