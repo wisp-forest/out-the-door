@@ -42,6 +42,10 @@ public class BackpackBlockEntity extends BlockEntity implements RenderAttachment
         return inventory;
     }
 
+    public BackpackItem cast() {
+        return ((BackpackItem) this.backpack.getItem());
+    }
+
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
