@@ -5,5 +5,8 @@
   "item.out-the-door.hide_backpack": "Hide Backpack",
   "item.out-the-door.pumpkin_backpack": "Pumpkin Backpack",
 
-  "key.out-the-door.openBackpack": "Open Backpack"
+  "key.out-the-door.openBackpack": "Open Backpack",
+
+  "text.config.out-the-door.title": "Out the Door - Configuration",
+  "text.config.out-the-door.option.funkyBackpacks": "Funky Backpacks"
 }

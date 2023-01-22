@@ -1,6 +1,7 @@
 package io.wispforest.outthedoor;
 
 import io.wispforest.outthedoor.misc.BackpackType;
+import io.wispforest.outthedoor.misc.OutTheDoorConfig;
 import io.wispforest.outthedoor.object.OutTheDoorBackpackTypes;
 import io.wispforest.outthedoor.object.OutTheDoorBlocks;
 import io.wispforest.outthedoor.object.OutTheDoorItems;
@@ -19,6 +20,7 @@ public class OutTheDoor implements ModInitializer {
     public static final String MOD_ID = "out-the-door";
 
     public static final OwoNetChannel CHANNEL = OwoNetChannel.create(id("network"));
+    public static final OutTheDoorConfig CONFIG = OutTheDoorConfig.createAndLoad();
 
     public static final OwoItemGroup GROUP = OwoItemGroup
             .builder(id("out-the-door"), () -> Icon.of(OutTheDoorItems.LEATHER_BACKPACK))

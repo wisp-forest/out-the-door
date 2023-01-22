@@ -56,9 +56,11 @@ public class OutTheDoorClient implements ClientModInitializer {
 
                 //noinspection unchecked
                 TrinketRenderer.translateToChest(matrices, (PlayerEntityModel<AbstractClientPlayerEntity>) contextModel, player);
-                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180));
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
-                matrices.translate(0, 0, -.375);
+                if (!OutTheDoor.CONFIG.funkyBackpacks()) {
+                    matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180));
+                    matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
+                    matrices.translate(0, 0, -.375);
+                }
 
                 MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformation.Mode.FIXED, light, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers, 0);
             });
