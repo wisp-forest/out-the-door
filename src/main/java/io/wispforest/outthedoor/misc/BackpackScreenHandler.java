@@ -23,23 +23,25 @@ public class BackpackScreenHandler extends ScreenHandler {
     public final boolean restoreParent;
 
     protected final SimpleInventory backpackInventory;
+    protected final Predicate<PlayerEntity> canUse;
 
     public static BackpackScreenHandler client(int syncId, PlayerInventory playerInventory, PacketByteBuf data) {
         var type = data.readRegistryValue(OutTheDoor.BACKPACK_REGISTRY);
         var restoreParent = data.readBoolean();
 
-        return new BackpackScreenHandler(syncId, playerInventory, new SimpleInventory(type.slots()), type, restoreParent);
+        return new BackpackScreenHandler(syncId, playerInventory, new SimpleInventory(type.slots()), type, player -> true, restoreParent);
     }
 
-    public BackpackScreenHandler(int syncId, PlayerInventory playerInventory, SimpleInventory backpackInventory, BackpackType type) {
-        this(syncId, playerInventory, backpackInventory, type, false);
+    public BackpackScreenHandler(int syncId, PlayerInventory playerInventory, SimpleInventory backpackInventory, BackpackType type, Predicate<PlayerEntity> canUse) {
+        this(syncId, playerInventory, backpackInventory, type, canUse, false);
     }
 
-    protected BackpackScreenHandler(int syncId, PlayerInventory playerInventory, SimpleInventory backpackInventory, BackpackType type, boolean restoreParent) {
+    protected BackpackScreenHandler(int syncId, PlayerInventory playerInventory, SimpleInventory backpackInventory, BackpackType type, Predicate<PlayerEntity> canUse, boolean restoreParent) {
         super(OutTheDoor.BACKPACK_SCREEN_HANDLER, syncId);
         this.backpackInventory = backpackInventory;
         this.type = type;
         this.restoreParent = restoreParent;
+        this.canUse = canUse;
 
         if (playerInventory.player instanceof ServerPlayerEntity player) {
             player.playSound(type.openSound(), 1f, 1f);
@@ -61,7 +63,7 @@ public class BackpackScreenHandler extends ScreenHandler {
 
     @Override
     public boolean canUse(PlayerEntity player) {
-        return true;
+        return this.canUse.test(player);
     }
 
     protected static class NoBackpackSlot extends ValidatingSlot {

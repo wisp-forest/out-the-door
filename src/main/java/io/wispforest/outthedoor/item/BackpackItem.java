@@ -153,7 +153,13 @@ public class BackpackItem extends BlockItem implements Trinket {
 
             @Override
             public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-                return new BackpackScreenHandler(syncId, inv, BackpackItem.this.createTrackedInventory(stack), BackpackItem.this.type);
+                return new BackpackScreenHandler(syncId, inv, BackpackItem.this.createTrackedInventory(stack), BackpackItem.this.type, user -> {
+                    if (user.getInventory().contains(stack)) return true;
+
+                    return TrinketsApi.getTrinketComponent(user).map(trinkets -> {
+                        return !trinkets.getEquipped(trinketStack -> trinketStack.equals(stack)).isEmpty();
+                    }).orElse(false);
+                });
             }
         });
     }

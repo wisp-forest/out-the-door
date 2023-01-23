@@ -77,7 +77,7 @@ public class BackpackBlock extends HorizontalFacingBlock implements BlockEntityP
 
                     @Override
                     public @NotNull ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-                        return new BackpackScreenHandler(syncId, inv, backpack.createTrackedInventory(), backpack.type());
+                        return new BackpackScreenHandler(syncId, inv, backpack.createTrackedInventory(), backpack.type(), user -> world.getBlockState(pos).isOf(BackpackBlock.this));
                     }
                 });
             }
