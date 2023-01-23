@@ -9,6 +9,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -33,6 +34,13 @@ public class BackpackBlock extends HorizontalFacingBlock implements BlockEntityP
 
     public BackpackBlock() {
         super(FabricBlockSettings.copyOf(Blocks.BROWN_WOOL).nonOpaque());
+    }
+
+    @Override
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+        return world.getBlockEntity(pos) instanceof BackpackBlockEntity backpack
+                ? backpack.backpack.copy()
+                : super.getPickStack(world, pos, state);
     }
 
     @Override
