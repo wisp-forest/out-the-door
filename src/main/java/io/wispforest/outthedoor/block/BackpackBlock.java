@@ -33,9 +33,7 @@ public class BackpackBlock extends HorizontalFacingBlock implements BlockEntityP
 
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return state.get(FACING).getAxis() == Direction.Axis.X
-                ? X_SHAPE
-                : Z_SHAPE;
+        return state.get(FACING).getAxis() == Direction.Axis.X ? X_SHAPE : Z_SHAPE;
     }
 
     @Override

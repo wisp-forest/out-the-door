@@ -7,6 +7,8 @@ import io.wispforest.owo.config.annotation.Modmenu;
 @Config(name = "out-the-door", wrapperName = "OutTheDoorConfig")
 public class OutTheDoorConfigModel {
 
+    public boolean returnToInventory = true;
+
     public boolean funkyBackpacks = false;
 
 }

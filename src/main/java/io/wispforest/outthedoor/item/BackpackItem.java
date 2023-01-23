@@ -4,7 +4,7 @@ import dev.emi.trinkets.api.TrinketsApi;
 import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.block.BackpackBlockEntity;
 import io.wispforest.outthedoor.misc.BackpackType;
-import io.wispforest.outthedoor.misc.OpenTrinketBackpackPacket;
+import io.wispforest.outthedoor.misc.OpenBackpackPacket;
 import io.wispforest.outthedoor.object.OutTheDoorBlocks;
 import io.wispforest.owo.itemgroup.OwoItemSettings;
 import io.wispforest.owo.nbt.NbtKey;
@@ -14,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.inventory.StackReference;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -21,8 +22,10 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.ClickType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
@@ -141,13 +144,15 @@ public class BackpackItem extends BlockItem {
     }
 
     static {
-        OutTheDoor.CHANNEL.registerServerbound(OpenTrinketBackpackPacket.class, (message, access) -> {
+        OutTheDoor.CHANNEL.registerServerbound(OpenBackpackPacket.class, (message, access) -> {
             TrinketsApi.getTrinketComponent(access.player()).ifPresent(trinkets -> {
                 var backpacks = trinkets.getEquipped(stack -> stack.getItem() instanceof BackpackItem);
-                if (backpacks.isEmpty()) return;
-
-                var backpackStack = backpacks.get(0).getRight();
-                ((BackpackItem) backpackStack.getItem()).openScreen(backpackStack, access.player());
+                if (!backpacks.isEmpty()) {
+                    var backpackStack = backpacks.get(0).getRight();
+                    ((BackpackItem) backpackStack.getItem()).openScreen(backpackStack, access.player());
+                } else if (access.player().getEquippedStack(EquipmentSlot.HEAD).getItem() instanceof BackpackItem backpack) {
+                    backpack.openScreen(access.player().getEquippedStack(EquipmentSlot.HEAD), access.player());
+                }
             });
         });
     }

@@ -5,7 +5,7 @@ import dev.emi.trinkets.api.client.TrinketRendererRegistry;
 import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.client.model.BackpackUnbakedModel;
 import io.wispforest.outthedoor.item.BackpackItem;
-import io.wispforest.outthedoor.misc.OpenTrinketBackpackPacket;
+import io.wispforest.outthedoor.misc.OpenBackpackPacket;
 import io.wispforest.outthedoor.object.OutTheDoorBlocks;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
@@ -47,7 +47,7 @@ public class OutTheDoorClient implements ClientModInitializer {
             boolean openScreen = false;
             while (OPEN_BACKPACK.wasPressed()) openScreen = true;
 
-            if (openScreen) OutTheDoor.CHANNEL.clientHandle().send(new OpenTrinketBackpackPacket());
+            if (openScreen) OutTheDoor.CHANNEL.clientHandle().send(new OpenBackpackPacket());
         });
 
         for (var backpack : BackpackItem.getAll()) {
