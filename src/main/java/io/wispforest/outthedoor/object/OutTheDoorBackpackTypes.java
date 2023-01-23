@@ -8,9 +8,9 @@ import net.minecraft.util.Identifier;
 
 public class OutTheDoorBackpackTypes implements AutoRegistryContainer<BackpackType> {
 
-    public static final BackpackType LEATHER = new Type("leather", OutTheDoor.id("item/leather_backpack"), 27);
-    public static final BackpackType HIDE = new Type("hide", OutTheDoor.id("item/hide_backpack"), 54);
-    public static final BackpackType PUMPKIN = new Type("pumpkin", OutTheDoor.id("item/pumpkin_backpack"), 27);
+    public static final BackpackType LEATHER = new Type("leather", OutTheDoor.id("item/leather_backpack"), 5, 5);
+    public static final BackpackType HIDE = new Type("hide", OutTheDoor.id("item/hide_backpack"), 5, 10);
+    public static final BackpackType PUMPKIN = new Type("pumpkin", OutTheDoor.id("item/pumpkin_backpack"), 6, 9);
 
     @Override
     public Registry<BackpackType> getRegistry() {
@@ -22,5 +22,5 @@ public class OutTheDoorBackpackTypes implements AutoRegistryContainer<BackpackTy
         return BackpackType.class;
     }
 
-    public record Type(String name, Identifier model, int slots) implements BackpackType {}
+    public record Type(String name, Identifier model, int rows, int rowWidth) implements BackpackType {}
 }

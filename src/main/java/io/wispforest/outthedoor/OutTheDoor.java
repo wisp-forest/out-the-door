@@ -1,5 +1,6 @@
 package io.wispforest.outthedoor;
 
+import io.wispforest.outthedoor.misc.BackpackScreenHandler;
 import io.wispforest.outthedoor.misc.BackpackType;
 import io.wispforest.outthedoor.misc.OutTheDoorConfig;
 import io.wispforest.outthedoor.object.OutTheDoorBackpackTypes;
@@ -12,7 +13,10 @@ import io.wispforest.owo.registration.reflect.FieldRegistrationHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 
 public class OutTheDoor implements ModInitializer {
@@ -30,12 +34,16 @@ public class OutTheDoor implements ModInitializer {
             .attribute(RegistryAttribute.SYNCED)
             .buildAndRegister();
 
+    public static final ScreenHandlerType<BackpackScreenHandler> BACKPACK_SCREEN_HANDLER = new ExtendedScreenHandlerType<>(BackpackScreenHandler::client);
+
     @Override
     public void onInitialize() {
         FieldRegistrationHandler.register(OutTheDoorBackpackTypes.class, MOD_ID, false);
 
         FieldRegistrationHandler.register(OutTheDoorBlocks.class, MOD_ID, true);
         FieldRegistrationHandler.register(OutTheDoorItems.class, MOD_ID, false);
+
+        Registry.register(Registries.SCREEN_HANDLER, id("backpack"), BACKPACK_SCREEN_HANDLER);
 
         GROUP.initialize();
     }

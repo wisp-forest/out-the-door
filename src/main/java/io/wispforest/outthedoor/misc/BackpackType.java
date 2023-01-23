@@ -7,5 +7,11 @@ public interface BackpackType {
 
     Identifier model();
 
-    int slots();
+    int rows();
+
+    int rowWidth();
+
+    default int slots() {
+        return rows() * rowWidth();
+    }
 }

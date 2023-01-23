@@ -1,14 +1,17 @@
 package io.wispforest.outthedoor.block;
 
+import io.wispforest.outthedoor.OutTheDoor;
+import io.wispforest.outthedoor.misc.BackpackScreenHandler;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -20,6 +23,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class BackpackBlock extends HorizontalFacingBlock implements BlockEntityProvider {
@@ -51,20 +55,21 @@ public class BackpackBlock extends HorizontalFacingBlock implements BlockEntityP
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (world.getBlockEntity(pos) instanceof BackpackBlockEntity backpack && backpack.hasBackpack()) {
             if (!world.isClient) {
-                player.openHandledScreen(new NamedScreenHandlerFactory() {
+                player.openHandledScreen(new ExtendedScreenHandlerFactory() {
+                    @Override
+                    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+                        buf.writeRegistryValue(OutTheDoor.BACKPACK_REGISTRY, backpack.type());
+                        buf.writeBoolean(false);
+                    }
+
                     @Override
                     public Text getDisplayName() {
                         return backpack.backpack.getName();
                     }
 
-                    @Nullable
                     @Override
-                    public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-                        return switch (backpack.type().slots()) {
-                            case 27 -> GenericContainerScreenHandler.createGeneric9x3(syncId, inv, backpack.createTrackedInventory());
-                            case 54 -> GenericContainerScreenHandler.createGeneric9x6(syncId, inv, backpack.createTrackedInventory());
-                            default -> null;
-                        };
+                    public @NotNull ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+                        return new BackpackScreenHandler(syncId, inv, backpack.createTrackedInventory(), backpack.type());
                     }
                 });
             }

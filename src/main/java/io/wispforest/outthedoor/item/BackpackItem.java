@@ -3,11 +3,13 @@ package io.wispforest.outthedoor.item;
 import dev.emi.trinkets.api.TrinketsApi;
 import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.block.BackpackBlockEntity;
+import io.wispforest.outthedoor.misc.BackpackScreenHandler;
 import io.wispforest.outthedoor.misc.BackpackType;
 import io.wispforest.outthedoor.misc.OpenBackpackPacket;
 import io.wispforest.outthedoor.object.OutTheDoorBlocks;
 import io.wispforest.owo.itemgroup.OwoItemSettings;
 import io.wispforest.owo.nbt.NbtKey;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,10 +21,10 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ClickType;
@@ -85,29 +87,34 @@ public class BackpackItem extends BlockItem {
         if (clickType != ClickType.RIGHT) return false;
 
         if (!player.world.isClient) {
-            this.openScreen(stack, player);
+            this.openScreen(stack, player, true);
         }
 
         return true;
     }
 
     protected void openScreen(ItemStack stack, PlayerEntity player) {
+        this.openScreen(stack, player, false);
+    }
+
+    protected void openScreen(ItemStack stack, PlayerEntity player, boolean restoreParent) {
         if (player.world.isClient) return;
 
-        player.openHandledScreen(new NamedScreenHandlerFactory() {
+        player.openHandledScreen(new ExtendedScreenHandlerFactory() {
+            @Override
+            public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+                buf.writeRegistryValue(OutTheDoor.BACKPACK_REGISTRY, BackpackItem.this.type);
+                buf.writeBoolean(restoreParent);
+            }
+
             @Override
             public Text getDisplayName() {
                 return BackpackItem.this.getName();
             }
 
-            @Nullable
             @Override
             public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-                return switch (BackpackItem.this.type.slots()) {
-                    case 27 -> GenericContainerScreenHandler.createGeneric9x3(syncId, inv, BackpackItem.this.createTrackedInventory(stack));
-                    case 54 -> GenericContainerScreenHandler.createGeneric9x6(syncId, inv, BackpackItem.this.createTrackedInventory(stack));
-                    default -> null;
-                };
+                return new BackpackScreenHandler(syncId, inv, BackpackItem.this.createTrackedInventory(stack), BackpackItem.this.type);
             }
         });
     }
@@ -121,6 +128,11 @@ public class BackpackItem extends BlockItem {
         }
 
         return true;
+    }
+
+    @Override
+    public boolean canBeNested() {
+        return false;
     }
 
     public SimpleInventory createTrackedInventory(ItemStack stack) {
