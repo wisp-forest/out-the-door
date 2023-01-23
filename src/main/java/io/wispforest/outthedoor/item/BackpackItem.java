@@ -77,6 +77,17 @@ public class BackpackItem extends BlockItem {
         }
     }
 
+    @Override
+    public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
+        if (clickType != ClickType.RIGHT) return false;
+
+        if (!player.world.isClient) {
+            this.openScreen(stack, player);
+        }
+
+        return true;
+    }
+
     protected void openScreen(ItemStack stack, PlayerEntity player) {
         if (player.world.isClient) return;
 
