@@ -13,6 +13,7 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.function.Predicate;
 
@@ -39,6 +40,11 @@ public class BackpackScreenHandler extends ScreenHandler {
         this.backpackInventory = backpackInventory;
         this.type = type;
         this.restoreParent = restoreParent;
+
+        if (playerInventory.player instanceof ServerPlayerEntity player) {
+            player.playSound(type.openSound(), 1f, 1f);
+            player.playSound(type.openSound(), player.getSoundCategory(), 1f, 1f);
+        }
 
         SlotGenerator.begin(this::addSlot, BackpackScreen.SIDE_PADDING + Math.max(0, (9 - type.rowWidth()) * 18 / 2) + 1, BackpackScreen.TOP_PADDING + 1)
                 .slotFactory((inventory, index, x, y) -> new NoBackpackSlot(inventory, index, x, y, stack -> stack.getItem().canBeNested()))

@@ -10,6 +10,7 @@ import net.minecraft.block.entity.BlockEntityType;
 
 public class OutTheDoorBlocks implements BlockRegistryContainer {
 
+    @NoBlockItem
     public static final Block BACKPACK = new BackpackBlock();
 
     public static class Entities implements BlockEntityRegistryContainer {

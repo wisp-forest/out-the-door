@@ -1,5 +1,7 @@
 package io.wispforest.outthedoor.item;
 
+import dev.emi.trinkets.api.SlotReference;
+import dev.emi.trinkets.api.Trinket;
 import dev.emi.trinkets.api.TrinketsApi;
 import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.block.BackpackBlockEntity;
@@ -12,6 +14,7 @@ import io.wispforest.owo.nbt.NbtKey;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
@@ -25,6 +28,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ClickType;
@@ -39,7 +43,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BackpackItem extends BlockItem {
+public class BackpackItem extends BlockItem implements Trinket {
 
     public static final NbtKey<NbtList> ITEMS_KEY = new NbtKey.ListKey<>("Items", NbtKey.Type.COMPOUND);
     private static final Map<BackpackType, BackpackItem> KNOWN_BACKPACK_ITEMS = new HashMap<>();
@@ -55,13 +59,10 @@ public class BackpackItem extends BlockItem {
                         .equipmentSlot(stack -> EquipmentSlot.HEAD)
         );
 
+        TrinketsApi.registerTrinket(this, this);
+
         this.type = type;
         KNOWN_BACKPACK_ITEMS.put(this.type, this);
-    }
-
-    @Override
-    public String getTranslationKey() {
-        return this.getOrCreateTranslationKey();
     }
 
     @Override
@@ -93,6 +94,44 @@ public class BackpackItem extends BlockItem {
         return true;
     }
 
+    @Override
+    protected boolean postPlacement(BlockPos pos, World world, @Nullable PlayerEntity player, ItemStack stack, BlockState state) {
+        super.postPlacement(pos, world, player, stack, state);
+
+        if (world.getBlockEntity(pos) instanceof BackpackBlockEntity backpack) {
+            backpack.backpack = stack.copy();
+        }
+
+        return true;
+    }
+
+    @Nullable
+    @Override
+    public SoundEvent getEquipSound() {
+        return this.type.equipSound();
+    }
+
+    @Override
+    public boolean canBeNested() {
+        return false;
+    }
+
+    @Override
+    public void onEquip(ItemStack stack, SlotReference slot, LivingEntity entity) {
+        if (entity.world.isClient) return;
+
+        entity.playSound(this.type.equipSound(), 1f, 1f);
+
+        if (entity instanceof PlayerEntity player) {
+            player.playSound(this.type.equipSound(), player.getSoundCategory(), 1f, 1f);
+        }
+    }
+
+    @Override
+    public String getTranslationKey() {
+        return this.getOrCreateTranslationKey();
+    }
+
     protected void openScreen(ItemStack stack, PlayerEntity player) {
         this.openScreen(stack, player, false);
     }
@@ -117,22 +156,6 @@ public class BackpackItem extends BlockItem {
                 return new BackpackScreenHandler(syncId, inv, BackpackItem.this.createTrackedInventory(stack), BackpackItem.this.type);
             }
         });
-    }
-
-    @Override
-    protected boolean postPlacement(BlockPos pos, World world, @Nullable PlayerEntity player, ItemStack stack, BlockState state) {
-        super.postPlacement(pos, world, player, stack, state);
-
-        if (world.getBlockEntity(pos) instanceof BackpackBlockEntity backpack) {
-            backpack.backpack = stack.copy();
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean canBeNested() {
-        return false;
     }
 
     public SimpleInventory createTrackedInventory(ItemStack stack) {

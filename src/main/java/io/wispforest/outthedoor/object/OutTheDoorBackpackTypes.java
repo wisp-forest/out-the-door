@@ -4,13 +4,24 @@ import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.misc.BackpackType;
 import io.wispforest.owo.registration.reflect.AutoRegistryContainer;
 import net.minecraft.registry.Registry;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 
 public class OutTheDoorBackpackTypes implements AutoRegistryContainer<BackpackType> {
 
-    public static final BackpackType LEATHER = new Type("leather", OutTheDoor.id("item/leather_backpack"), 5, 5);
-    public static final BackpackType HIDE = new Type("hide", OutTheDoor.id("item/hide_backpack"), 5, 10);
-    public static final BackpackType PUMPKIN = new Type("pumpkin", OutTheDoor.id("item/pumpkin_backpack"), 6, 9);
+    public static final BlockSoundGroup LEATHER_SOUND_GROUP = new BlockSoundGroup(
+            1f, 1f,
+            SoundEvents.BLOCK_WOOL_BREAK,
+            SoundEvents.BLOCK_WOOL_STEP,
+            SoundEvents.ITEM_BUNDLE_DROP_CONTENTS,
+            SoundEvents.BLOCK_WOOL_HIT,
+            SoundEvents.BLOCK_WOOL_STEP
+    );
+
+    public static final BackpackType LEATHER = new Type("leather", OutTheDoor.id("item/leather_backpack"), 5, 5, LEATHER_SOUND_GROUP);
+    public static final BackpackType HIDE = new Type("hide", OutTheDoor.id("item/hide_backpack"), 5, 10, LEATHER_SOUND_GROUP);
+    public static final BackpackType PUMPKIN = new Type("pumpkin", OutTheDoor.id("item/pumpkin_backpack"), 6, 9, BlockSoundGroup.WOOD);
 
     @Override
     public Registry<BackpackType> getRegistry() {
@@ -22,5 +33,5 @@ public class OutTheDoorBackpackTypes implements AutoRegistryContainer<BackpackTy
         return BackpackType.class;
     }
 
-    public record Type(String name, Identifier model, int rows, int rowWidth) implements BackpackType {}
+    public record Type(String name, Identifier model, int rows, int rowWidth, BlockSoundGroup blockSounds) implements BackpackType {}
 }
