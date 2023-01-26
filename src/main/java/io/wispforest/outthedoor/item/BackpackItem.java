@@ -13,6 +13,7 @@ import io.wispforest.owo.itemgroup.OwoItemSettings;
 import io.wispforest.owo.nbt.NbtKey;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -38,10 +39,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class BackpackItem extends BlockItem implements Trinket {
 
@@ -125,6 +123,13 @@ public class BackpackItem extends BlockItem implements Trinket {
         if (entity instanceof PlayerEntity player) {
             player.playSound(this.type.equipSound(), player.getSoundCategory(), 1f, 1f);
         }
+    }
+
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        super.appendTooltip(stack, world, tooltip, context);
+        tooltip.add(Text.translatable("item.out-the-door.backpack.tooltip.slot_count", this.type.slots()));
+        tooltip.add(Text.empty());
     }
 
     @Override
