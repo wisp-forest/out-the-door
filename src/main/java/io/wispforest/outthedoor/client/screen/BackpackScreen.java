@@ -1,6 +1,7 @@
 package io.wispforest.outthedoor.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.misc.BackpackScreenHandler;
 import io.wispforest.outthedoor.misc.BackpackType;
 import io.wispforest.owo.ui.util.Drawer;
@@ -50,7 +51,7 @@ public class BackpackScreen extends HandledScreen<BackpackScreenHandler> {
     public void close() {
         super.close();
 
-        if (this.handler.restoreParent) {
+        if (this.handler.restoreParent && OutTheDoor.CONFIG.returnToInventory()) {
             this.client.setScreen(this.parent);
         }
     }
