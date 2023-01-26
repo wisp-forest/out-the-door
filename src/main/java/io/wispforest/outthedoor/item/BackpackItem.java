@@ -110,6 +110,11 @@ public class BackpackItem extends BlockItem implements Trinket {
     }
 
     @Override
+    protected SoundEvent getPlaceSound(BlockState state) {
+        return this.type.blockSounds().getPlaceSound();
+    }
+
+    @Override
     public boolean canBeNested() {
         return false;
     }
