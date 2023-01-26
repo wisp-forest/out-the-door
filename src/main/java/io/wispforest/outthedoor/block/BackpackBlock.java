@@ -1,6 +1,8 @@
 package io.wispforest.outthedoor.block;
 
+import dev.emi.trinkets.api.TrinketItem;
 import io.wispforest.outthedoor.OutTheDoor;
+import io.wispforest.outthedoor.item.BackpackItem;
 import io.wispforest.outthedoor.misc.BackpackScreenHandler;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -39,7 +41,7 @@ public class BackpackBlock extends HorizontalFacingBlock implements BlockEntityP
     @Override
     public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         return world.getBlockEntity(pos) instanceof BackpackBlockEntity backpack
-                ? backpack.backpack.copy()
+                ? BackpackItem.get(backpack.type()).getDefaultStack()
                 : super.getPickStack(world, pos, state);
     }
 
@@ -63,23 +65,28 @@ public class BackpackBlock extends HorizontalFacingBlock implements BlockEntityP
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (world.getBlockEntity(pos) instanceof BackpackBlockEntity backpack && backpack.hasBackpack()) {
             if (!world.isClient) {
-                player.openHandledScreen(new ExtendedScreenHandlerFactory() {
-                    @Override
-                    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-                        buf.writeRegistryValue(OutTheDoor.BACKPACK_REGISTRY, backpack.type());
-                        buf.writeBoolean(false);
-                    }
+                if (player.isSneaking()) {
+                    if (!TrinketItem.equipItem(player, backpack.backpack)) return ActionResult.PASS;
+                    world.removeBlock(pos, false);
+                } else {
+                    player.openHandledScreen(new ExtendedScreenHandlerFactory() {
+                        @Override
+                        public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+                            buf.writeRegistryValue(OutTheDoor.BACKPACK_REGISTRY, backpack.type());
+                            buf.writeBoolean(false);
+                        }
 
-                    @Override
-                    public Text getDisplayName() {
-                        return backpack.backpack.getName();
-                    }
+                        @Override
+                        public Text getDisplayName() {
+                            return backpack.backpack.getName();
+                        }
 
-                    @Override
-                    public @NotNull ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-                        return new BackpackScreenHandler(syncId, inv, backpack.createTrackedInventory(), backpack.type(), user -> world.getBlockState(pos).isOf(BackpackBlock.this));
-                    }
-                });
+                        @Override
+                        public @NotNull ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+                            return new BackpackScreenHandler(syncId, inv, backpack.createTrackedInventory(), backpack.type(), user -> world.getBlockState(pos).isOf(BackpackBlock.this));
+                        }
+                    });
+                }
             }
 
             return ActionResult.SUCCESS;
