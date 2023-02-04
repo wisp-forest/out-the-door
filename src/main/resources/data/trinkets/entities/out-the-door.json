@@ -1,7 +1,8 @@
 {
   "replace": false,
   "entities": [
-    "player"
+    "player",
+    "zombie"
   ],
   "slots": [
     "chest/back"

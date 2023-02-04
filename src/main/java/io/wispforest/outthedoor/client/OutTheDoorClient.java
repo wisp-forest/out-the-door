@@ -1,6 +1,5 @@
 package io.wispforest.outthedoor.client;
 
-import dev.emi.trinkets.api.client.TrinketRenderer;
 import dev.emi.trinkets.api.client.TrinketRendererRegistry;
 import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.client.model.BackpackUnbakedModel;
@@ -17,12 +16,13 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.entity.model.PlayerEntityModel;
+import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.RotationAxis;
 import org.lwjgl.glfw.GLFW;
 
@@ -56,10 +56,8 @@ public class OutTheDoorClient implements ClientModInitializer {
 
         for (var backpack : BackpackItem.getAll()) {
             TrinketRendererRegistry.registerRenderer(backpack, (stack, slotReference, contextModel, matrices, vertexConsumers, light, entity, limbAngle, limbDistance, tickDelta, animationProgress, headYaw, headPitch) -> {
-                if (!(entity instanceof AbstractClientPlayerEntity player)) return;
-
                 //noinspection unchecked
-                TrinketRenderer.translateToChest(matrices, (PlayerEntityModel<AbstractClientPlayerEntity>) contextModel, player);
+                translateToChest(matrices, (BipedEntityModel<LivingEntity>) contextModel, entity);
                 if (!OutTheDoor.CONFIG.funkyBackpacks()) {
                     matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180));
                     matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
@@ -69,5 +67,18 @@ public class OutTheDoorClient implements ClientModInitializer {
                 MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformation.Mode.FIXED, light, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers, 0);
             });
         }
+    }
+
+    // Copied straight from TrinketRenderer
+    // Pretty cool how that method requires a player
+    static void translateToChest(MatrixStack matrices, BipedEntityModel<LivingEntity> model,
+                                 LivingEntity entity) {
+
+        if (entity.isInSneakingPose() && !model.riding && !entity.isSwimming()) {
+            matrices.translate(0.0F, 0.2F, 0.0F);
+            matrices.multiply(RotationAxis.POSITIVE_X.rotation(model.body.pitch));
+        }
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotation(model.body.yaw));
+        matrices.translate(0.0F, 0.4F, -0.16F);
     }
 }
