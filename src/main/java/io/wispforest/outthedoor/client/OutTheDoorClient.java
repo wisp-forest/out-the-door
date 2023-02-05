@@ -56,12 +56,20 @@ public class OutTheDoorClient implements ClientModInitializer {
 
         for (var backpack : BackpackItem.getAll()) {
             TrinketRendererRegistry.registerRenderer(backpack, (stack, slotReference, contextModel, matrices, vertexConsumers, light, entity, limbAngle, limbDistance, tickDelta, animationProgress, headYaw, headPitch) -> {
-                //noinspection unchecked
-                translateToChest(matrices, (BipedEntityModel<LivingEntity>) contextModel, entity);
+                matrices.translate(0, .75, 0);
+                if (entity.isBaby()) {
+                    //noinspection unchecked
+                    translateToFace(matrices, (BipedEntityModel<LivingEntity>) contextModel, entity);
+                } else {
+                    //noinspection unchecked
+                    translateToChest(matrices, (BipedEntityModel<LivingEntity>) contextModel, entity);
+                }
+                matrices.translate(0, -.75, 0);
+
                 if (!OutTheDoor.CONFIG.funkyBackpacks()) {
+                    matrices.translate(0, entity.isBaby() ? .05 : -.1, entity.isBaby() ? .55 : .375);
                     matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180));
                     matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
-                    matrices.translate(0, 0, -.375);
                 }
 
                 MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformation.Mode.FIXED, light, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers, 0);
@@ -80,5 +88,30 @@ public class OutTheDoorClient implements ClientModInitializer {
         }
         matrices.multiply(RotationAxis.POSITIVE_Y.rotation(model.body.yaw));
         matrices.translate(0.0F, 0.4F, -0.16F);
+    }
+
+    // Copied straight from TrinketRenderer and patched to respect babies
+    // Pretty cool how that method requires a player
+    static void translateToFace(MatrixStack matrices, BipedEntityModel<LivingEntity> model,
+                                LivingEntity entity) {
+
+        if (entity.isInSwimmingPose() || entity.isFallFlying()) {
+            matrices.multiply(RotationAxis.POSITIVE_Z.rotation(model.head.roll));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotation(model.head.yaw));
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-45.0F));
+        } else {
+            if (entity.isInSneakingPose() && !model.riding) {
+                matrices.translate(0.0F, 0.25F, 0.0F);
+            }
+
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotation(model.head.yaw));
+            matrices.multiply(RotationAxis.POSITIVE_X.rotation(model.head.pitch));
+        }
+
+        if (entity.isBaby()) {
+            matrices.translate(0.0F, .45, -0.3F);
+        } else {
+            matrices.translate(0.0F, -0.25F, -0.3F);
+        }
     }
 }
