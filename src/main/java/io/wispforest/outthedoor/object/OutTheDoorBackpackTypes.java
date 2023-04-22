@@ -19,7 +19,7 @@ public class OutTheDoorBackpackTypes implements AutoRegistryContainer<BackpackTy
             SoundEvents.BLOCK_WOOL_STEP
     );
 
-    public static final BackpackType PUMPKIN = new Type("pumpkin", OutTheDoor.id("item/pumpkin_backpack"), 3, 5, BlockSoundGroup.WOOD);
+    public static final BackpackType PUMPKIN = new Type("pumpkin", OutTheDoor.id("item/pumpkin_backpack"), 4, 5, BlockSoundGroup.WOOD);
     public static final BackpackType LEATHER = new Type("leather", OutTheDoor.id("item/leather_backpack"), 4, 5, LEATHER_SOUND_GROUP);
     public static final BackpackType HIDE = new Type("hide", OutTheDoor.id("item/hide_backpack"), 5, 7, LEATHER_SOUND_GROUP);
 

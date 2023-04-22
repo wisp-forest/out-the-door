@@ -22,6 +22,7 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.Equipment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtList;
@@ -41,7 +42,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class BackpackItem extends BlockItem implements Trinket {
+public class BackpackItem extends BlockItem implements Trinket, Equipment {
 
     public static final NbtKey<NbtList> ITEMS_KEY = new NbtKey.ListKey<>("Items", NbtKey.Type.COMPOUND);
     private static final Map<BackpackType, BackpackItem> KNOWN_BACKPACK_ITEMS = new HashMap<>();
@@ -54,7 +55,7 @@ public class BackpackItem extends BlockItem implements Trinket {
                 new OwoItemSettings()
                         .group(OutTheDoor.GROUP)
                         .maxCount(1)
-                        .equipmentSlot(stack -> EquipmentSlot.HEAD)
+//                        .equipmentSlot(stack -> EquipmentSlot.HEAD)
         );
 
         TrinketsApi.registerTrinket(this, this);
@@ -101,6 +102,11 @@ public class BackpackItem extends BlockItem implements Trinket {
         }
 
         return true;
+    }
+
+    @Override
+    public EquipmentSlot getSlotType() {
+        return EquipmentSlot.HEAD;
     }
 
     @Nullable

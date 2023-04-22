@@ -2,26 +2,33 @@
   "schemaVersion": 1,
   "id": "out-the-door",
   "version": "${version}",
-
   "name": "Out The Door",
-  "description": "",
-  "authors": [],
+  "description": "Headpacks with style",
+  "authors": [
+    "glisco"
+  ],
+  "contributors": [
+    "paintedwithdrugs"
+  ],
   "contact": {},
-
   "license": "MIT",
   "icon": "assets/out-the-door/icon.png",
-
   "environment": "*",
-  "entrypoints": {"client": ["io.wispforest.outthedoor.client.OutTheDoorClient"], "main": ["io.wispforest.outthedoor.OutTheDoor"]},
-
+  "entrypoints": {
+    "client": [
+      "io.wispforest.outthedoor.client.OutTheDoorClient"
+    ],
+    "main": [
+      "io.wispforest.outthedoor.OutTheDoor"
+    ]
+  },
   "mixins": [
     "out-the-door.mixins.json"
   ],
-
   "depends": {
     "fabricloader": ">=0.14.13",
     "fabric": "*",
-    "minecraft": "1.19.3",
+    "minecraft": "1.19.4",
     "owo-lib": ">=0.10.0",
     "trinkets": ">=3.5.0"
   }

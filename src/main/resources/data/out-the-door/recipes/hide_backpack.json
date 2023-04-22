@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "tools",
+  "key": {
+    "h": {
+      "item": "minecraft:rabbit_hide"
+    },
+    "c": {
+      "item": "minecraft:chest"
+    },
+    "w": {
+      "item": "minecraft:honeycomb"
+    }
+  },
+  "pattern": [
+    "whw",
+    "hch",
+    "hhh"
+  ],
+  "result": {
+    "item": "out-the-door:hide_backpack"
+  }
+}

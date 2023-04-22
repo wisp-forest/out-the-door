@@ -11,6 +11,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.item.Equipment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
@@ -65,7 +66,7 @@ public abstract class ZombieEntityMixin extends HostileEntity {
                             if (TrinketSlot.canInsert(stack, ref, user)) {
                                 ItemStack newStack = stack.copy();
                                 inv.setStack(i, newStack);
-                                SoundEvent soundEvent = stack.getEquipSound();
+                                SoundEvent soundEvent = stack.getItem() instanceof Equipment eq ? eq.getEquipSound() : null;
                                 if (!stack.isEmpty() && soundEvent != null) {
                                     user.emitGameEvent(GameEvent.EQUIP);
                                     user.playSound(soundEvent, 1.0F, 1.0F);

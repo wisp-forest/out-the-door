@@ -26,6 +26,6 @@ public interface BackpackType {
     BlockSoundGroup blockSounds();
 
     default int slots() {
-        return rows() * rowWidth();
+        return this.rows() * this.rowWidth();
     }
 }

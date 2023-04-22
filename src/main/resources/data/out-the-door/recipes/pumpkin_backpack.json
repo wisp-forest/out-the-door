@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "tools",
+  "key": {
+    "l": {
+      "item": "minecraft:leather"
+    },
+    "c": {
+      "item": "minecraft:chest"
+    },
+    "i": {
+      "item": "minecraft:iron_ingot"
+    },
+    "p": {
+      "item": "minecraft:carved_pumpkin"
+    }
+  },
+  "pattern": [
+    "ipi",
+    "lcl",
+    "lll"
+  ],
+  "result": {
+    "item": "out-the-door:pumpkin_backpack"
+  }
+}
