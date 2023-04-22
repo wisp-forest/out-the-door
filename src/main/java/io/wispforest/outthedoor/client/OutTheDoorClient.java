@@ -83,9 +83,10 @@ public class OutTheDoorClient implements ClientModInitializer {
                                  LivingEntity entity) {
 
         if (entity.isInSneakingPose() && !model.riding && !entity.isSwimming()) {
-            matrices.translate(0.0F, 0.2F, 0.0F);
+            matrices.translate(0.0F, 0.12F, 0.38F);
             matrices.multiply(RotationAxis.POSITIVE_X.rotation(model.body.pitch));
         }
+
         matrices.multiply(RotationAxis.POSITIVE_Y.rotation(model.body.yaw));
         matrices.translate(0.0F, 0.4F, -0.16F);
     }
