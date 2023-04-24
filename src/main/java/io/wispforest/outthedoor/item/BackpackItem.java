@@ -144,7 +144,7 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
 
-        if (!Screen.hasShiftDown() && stack.hasNbt() && stack.getNbt().get("Items") instanceof NbtList items && !items.isEmpty()) {
+        if (!OutTheDoor.CONFIG.alwaysDisplayContents() && (!Screen.hasShiftDown() && stack.hasNbt() && stack.getNbt().get("Items") instanceof NbtList items && !items.isEmpty())) {
             tooltip.add(Text.translatable("item.out-the-door.backpack.tooltip.view_contents"));
         }
 
@@ -155,7 +155,7 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
     @Override
     @Environment(EnvType.CLIENT)
     public Optional<TooltipData> getTooltipData(ItemStack stack) {
-        if (!Screen.hasShiftDown()) return super.getTooltipData(stack);
+        if (!OutTheDoor.CONFIG.alwaysDisplayContents() && !Screen.hasShiftDown()) return super.getTooltipData(stack);
 
         var stacks = DefaultedList.ofSize(this.type.slots(), ItemStack.EMPTY);
         Inventories.readNbt(stack.getOrCreateNbt(), stacks);

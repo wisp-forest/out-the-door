@@ -12,18 +12,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MouseMixin implements OutTheDoorMouseExtension {
 
     @Unique
-    private boolean outTheDoor$skipUnlock = false;
+    private boolean otd$skipUnlock = false;
 
     @Override
-    public void outTheDoor$skipUnlockCursor() {
-        this.outTheDoor$skipUnlock = true;
+    public void otd$skipUnlockCursor() {
+        this.otd$skipUnlock = true;
     }
 
     @Inject(method = "unlockCursor", at = @At("HEAD"), cancellable = true)
     private void skipUnlock(CallbackInfo ci) {
-        if (!this.outTheDoor$skipUnlock) return;
+        if (!this.otd$skipUnlock) return;
 
-        this.outTheDoor$skipUnlock = false;
+        this.otd$skipUnlock = false;
         ci.cancel();
     }
 }

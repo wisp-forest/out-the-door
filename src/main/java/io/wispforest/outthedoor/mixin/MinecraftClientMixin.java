@@ -28,7 +28,7 @@ public class MinecraftClientMixin {
     @Inject(method = "setScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;", opcode = Opcodes.PUTFIELD))
     private void skipMouseUnlock(Screen screen, CallbackInfo ci) {
         if (this.currentScreen == null || screen == null || (!(screen instanceof BackpackScreen)) && !(this.currentScreen instanceof BackpackScreen)) return;
-        ((OutTheDoorMouseExtension) this.mouse).outTheDoor$skipUnlockCursor();
+        ((OutTheDoorMouseExtension) this.mouse).otd$skipUnlockCursor();
     }
 
 }

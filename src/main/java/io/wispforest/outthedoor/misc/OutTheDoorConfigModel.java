@@ -12,7 +12,8 @@ public class OutTheDoorConfigModel {
 
     public boolean funkyBackpacks = false;
 
-    @RangeConstraint(min = 0, max = 100)
-    public int zombieBackpackChance = 2;
+    public boolean alwaysDisplayContents = false;
 
+    @RangeConstraint(min = 0, max = 100)
+    public float zombieBackpackChance = 0.5f;
 }

@@ -23,5 +23,6 @@
   "text.config.out-the-door.title": "Out the Door - Configuration",
   "text.config.out-the-door.option.funkyBackpacks": "Funky backpacks",
   "text.config.out-the-door.option.returnToInventory": "Return to inventory",
+  "text.config.out-the-door.option.alwaysDisplayContents": "Always display backpack contents",
   "text.config.out-the-door.option.zombieBackpackChance": "Zombie backpack chance"
 }
