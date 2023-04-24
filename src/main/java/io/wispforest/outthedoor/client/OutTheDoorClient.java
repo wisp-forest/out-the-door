@@ -5,6 +5,7 @@ import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.client.model.BackpackUnbakedModel;
 import io.wispforest.outthedoor.client.screen.BackpackScreen;
 import io.wispforest.outthedoor.item.BackpackItem;
+import io.wispforest.outthedoor.misc.BackpackTooltipData;
 import io.wispforest.outthedoor.misc.OpenBackpackPacket;
 import io.wispforest.outthedoor.object.OutTheDoorBlocks;
 import net.fabricmc.api.ClientModInitializer;
@@ -14,6 +15,7 @@ import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.option.KeyBinding;
@@ -53,6 +55,12 @@ public class OutTheDoorClient implements ClientModInitializer {
         });
 
         HandledScreens.register(OutTheDoor.BACKPACK_SCREEN_HANDLER, BackpackScreen::new);
+
+        TooltipComponentCallback.EVENT.register(data -> {
+            return data instanceof BackpackTooltipData backpackData
+                    ? new BackpackTooltipComponent(backpackData.items())
+                    : null;
+        });
 
         for (var backpack : BackpackItem.getAll()) {
             TrinketRendererRegistry.registerRenderer(backpack, (stack, slotReference, contextModel, matrices, vertexConsumers, light, entity, limbAngle, limbDistance, tickDelta, animationProgress, headYaw, headPitch) -> {

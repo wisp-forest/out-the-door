@@ -6,14 +6,19 @@ import dev.emi.trinkets.api.TrinketsApi;
 import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.block.BackpackBlockEntity;
 import io.wispforest.outthedoor.misc.BackpackScreenHandler;
+import io.wispforest.outthedoor.misc.BackpackTooltipData;
 import io.wispforest.outthedoor.misc.BackpackType;
 import io.wispforest.outthedoor.misc.OpenBackpackPacket;
 import io.wispforest.outthedoor.object.OutTheDoorBlocks;
 import io.wispforest.owo.itemgroup.OwoItemSettings;
 import io.wispforest.owo.nbt.NbtKey;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.item.TooltipData;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -32,10 +37,8 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ClickType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.*;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -137,10 +140,29 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
+
+        if (!Screen.hasShiftDown() && stack.hasNbt() && stack.getNbt().get("Items") instanceof NbtList items && !items.isEmpty()) {
+            tooltip.add(Text.translatable("item.out-the-door.backpack.tooltip.view_contents"));
+        }
+
         tooltip.add(Text.translatable("item.out-the-door.backpack.tooltip.slot_count", this.type.slots()));
         tooltip.add(Text.empty());
+    }
+
+    @Override
+    @Environment(EnvType.CLIENT)
+    public Optional<TooltipData> getTooltipData(ItemStack stack) {
+        if (!Screen.hasShiftDown()) return super.getTooltipData(stack);
+
+        var stacks = DefaultedList.ofSize(this.type.slots(), ItemStack.EMPTY);
+        Inventories.readNbt(stack.getOrCreateNbt(), stacks);
+
+        return Optional.of(new BackpackTooltipData(
+                Util.make(DefaultedList.of(), displayStacks -> stacks.stream().filter($ -> !$.isEmpty()).forEach(displayStacks::add))
+        ));
     }
 
     @Override
