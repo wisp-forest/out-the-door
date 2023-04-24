@@ -6,14 +6,14 @@ import io.wispforest.outthedoor.misc.BackpackScreenHandler;
 import io.wispforest.outthedoor.misc.BackpackType;
 import io.wispforest.owo.ui.util.Drawer;
 import io.wispforest.owo.ui.util.OwoNinePatchRenderers;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
 
 public class BackpackScreen extends HandledScreen<BackpackScreenHandler> {
 
@@ -25,13 +25,10 @@ public class BackpackScreen extends HandledScreen<BackpackScreenHandler> {
     public static final int SIDE_PADDING = 7;
 
     protected final BackpackType type;
-    protected final @Nullable Screen parent;
 
     public BackpackScreen(BackpackScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
         this.type = handler.type;
-
-        this.parent = MinecraftClient.getInstance().currentScreen;
 
         this.backgroundWidth = SIDE_PADDING + Math.max(9 * 18, type.rowWidth() * 18) + SIDE_PADDING;
         this.backgroundHeight = TOP_PADDING + (18 * type.rows()) + SEPARATOR_HEIGHT + PLAYER_INVENTORY_HEIGHT + 7;
@@ -49,11 +46,19 @@ public class BackpackScreen extends HandledScreen<BackpackScreenHandler> {
 
     @Override
     public void close() {
-        super.close();
-
         if (this.handler.restoreParent && OutTheDoor.CONFIG.returnToInventory()) {
-            this.client.setScreen(this.parent);
+            this.client.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(this.client.player.currentScreenHandler.syncId));
+            this.client.setScreen(new InventoryScreen(this.client.player));
+        } else {
+            super.close();
         }
+
+        // I absolutely detest this fix, but I don't have infinite time to
+        // try and figure out why the inventory desyncs after using a
+        // backpack but *fixes itself* when setting a breakpoint
+        //
+        // glisco, 24.04.2023
+        this.client.interactionManager.clickSlot(this.client.player.playerScreenHandler.syncId, -999, 0, SlotActionType.CLONE, this.client.player);
     }
 
     @Override

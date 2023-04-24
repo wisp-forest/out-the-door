@@ -153,9 +153,10 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
     }
 
     protected void openScreen(ItemStack stack, PlayerEntity player, boolean restoreParent) {
-        if (player.world.isClient) return;
+        if (!(player instanceof ServerPlayerEntity serverPlayer)) return;
 
-        player.openHandledScreen(new ExtendedScreenHandlerFactory() {
+        serverPlayer.onHandledScreenClosed();
+        serverPlayer.openHandledScreen(new ExtendedScreenHandlerFactory() {
             @Override
             public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
                 buf.writeRegistryValue(OutTheDoor.BACKPACK_REGISTRY, BackpackItem.this.type);
