@@ -66,7 +66,7 @@ public class BackpackBlock extends HorizontalFacingBlock implements BlockEntityP
         if (world.getBlockEntity(pos) instanceof BackpackBlockEntity backpack && backpack.hasBackpack()) {
             if (!world.isClient) {
                 if (player.isSneaking()) {
-                    if (!TrinketItem.equipItem(player, backpack.backpack)) return ActionResult.PASS;
+                    if (!TrinketItem.equipItem(player, backpack.backpack())) return ActionResult.PASS;
                     world.removeBlock(pos, false);
                 } else {
                     player.openHandledScreen(new ExtendedScreenHandlerFactory() {
@@ -78,12 +78,12 @@ public class BackpackBlock extends HorizontalFacingBlock implements BlockEntityP
 
                         @Override
                         public Text getDisplayName() {
-                            return backpack.backpack.getName();
+                            return backpack.backpack().getName();
                         }
 
                         @Override
                         public @NotNull ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-                            return new BackpackScreenHandler(syncId, inv, backpack.createTrackedInventory(), backpack.type(), user -> world.getBlockState(pos).isOf(BackpackBlock.this));
+                            return new BackpackScreenHandler(syncId, inv, backpack.inventory(), backpack.type(), user -> world.getBlockState(pos).isOf(BackpackBlock.this));
                         }
                     });
                 }
@@ -99,7 +99,7 @@ public class BackpackBlock extends HorizontalFacingBlock implements BlockEntityP
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (state.getBlock() != newState.getBlock()) {
             if (world.getBlockEntity(pos) instanceof BackpackBlockEntity backpack) {
-                ItemScatterer.spawn(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, backpack.backpack);
+                ItemScatterer.spawn(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, backpack.backpack());
             }
 
             super.onStateReplaced(state, world, pos, newState, moved);

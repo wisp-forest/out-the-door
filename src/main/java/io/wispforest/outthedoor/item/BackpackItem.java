@@ -101,7 +101,7 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
         super.postPlacement(pos, world, player, stack, state);
 
         if (world.getBlockEntity(pos) instanceof BackpackBlockEntity backpack) {
-            backpack.backpack = stack.copy();
+            backpack.setBackpack(stack.copy());
         }
 
         return true;
