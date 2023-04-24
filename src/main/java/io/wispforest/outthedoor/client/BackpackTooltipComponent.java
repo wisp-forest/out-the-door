@@ -19,19 +19,18 @@ public class BackpackTooltipComponent implements TooltipComponent {
     private final GridLayout grid;
 
     public BackpackTooltipComponent(DefaultedList<ItemStack> stacks) {
-        this.grid = Containers.grid(Sizing.content(), Sizing.content(), MathHelper.ceilDiv(stacks.size(), 7), 7);
+        this.grid = Containers.grid(Sizing.content(), Sizing.content(), MathHelper.ceilDiv(stacks.size(), 9), 9);
 
         for (int i = 0; i < stacks.size(); i++) {
             this.grid.padding(Insets.bottom(5));
 
             var stack = stacks.get(i);
             this.grid.child(
-                    Components.item(stack), i / 7, i % 7
+                    Components.item(stack).showOverlay(true).margins(Insets.of(1)), i / 9, i % 9
             );
         }
-
-        this.grid.mount(null, 0, 0);
         this.grid.inflate(Size.of(1000, 1000));
+        this.grid.mount(null, 0, 0);
     }
 
     @Override
