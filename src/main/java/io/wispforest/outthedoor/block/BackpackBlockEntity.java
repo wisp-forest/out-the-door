@@ -4,6 +4,7 @@ import io.wispforest.outthedoor.item.BackpackItem;
 import io.wispforest.outthedoor.misc.BackpackType;
 import io.wispforest.outthedoor.object.OutTheDoorBlocks;
 import io.wispforest.owo.nbt.NbtKey;
+import io.wispforest.owo.ops.WorldOps;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
@@ -12,6 +13,9 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,11 +68,24 @@ public class BackpackBlockEntity extends BlockEntity implements RenderAttachment
         return nbt;
     }
 
+    @Override
+    public void markDirty() {
+        super.markDirty();
+        WorldOps.updateIfOnServer(this.world, this.pos);
+    }
+
+    @Nullable
+    @Override
+    public Packet<ClientPlayPacketListener> toUpdatePacket() {
+        return BlockEntityUpdateS2CPacket.create(this);
+    }
+
     public void setBackpack(ItemStack backpack) {
         this.backpack = backpack;
+        this.markDirty();
 
         this.inventory = this.cast().createTrackedInventory(this.backpack);
-        inventory.addListener(sender -> this.markDirty());
+        this.inventory.addListener(sender -> this.markDirty());
     }
 
     public ItemStack backpack() {
