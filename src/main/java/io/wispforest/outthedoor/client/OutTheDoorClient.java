@@ -80,7 +80,7 @@ public class OutTheDoorClient implements ClientModInitializer {
                     matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
                 }
 
-                MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformationMode.FIXED, light, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers, entity.world, 0);
+                MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformationMode.FIXED, light, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers, entity.getWorld(), 0);
             });
         }
     }

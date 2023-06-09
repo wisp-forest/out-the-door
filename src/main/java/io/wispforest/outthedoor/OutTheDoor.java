@@ -16,6 +16,7 @@ import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 
@@ -30,7 +31,7 @@ public class OutTheDoor implements ModInitializer {
             .builder(id("out-the-door"), () -> Icon.of(OutTheDoorItems.LEATHER_BACKPACK))
             .build();
 
-    public static final Registry<BackpackType> BACKPACK_REGISTRY = FabricRegistryBuilder.createSimple(BackpackType.class, id("backpack"))
+    public static final Registry<BackpackType> BACKPACK_REGISTRY = FabricRegistryBuilder.createSimple(RegistryKey.<BackpackType>ofRegistry(id("backpack")))
             .attribute(RegistryAttribute.SYNCED)
             .buildAndRegister();
 

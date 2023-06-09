@@ -31,8 +31,8 @@ public class BackpackModel implements BakedModel, FabricBakedModel {
 
     @Override
     public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext context) {
-        var modelId = (Identifier) ((RenderAttachedBlockView) blockView).getBlockEntityRenderAttachment(pos);
-        if (modelId == null) return;
+        var data = ((RenderAttachedBlockView) blockView).getBlockEntityRenderAttachment(pos);
+        if (!(data instanceof Identifier modelId)) return;
 
         ((FabricBakedModel) this.backpackModels.get(modelId)).emitBlockQuads(blockView, state, pos, randomSupplier, context);
     }

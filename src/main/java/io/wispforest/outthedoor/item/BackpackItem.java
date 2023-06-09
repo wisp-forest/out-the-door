@@ -89,7 +89,7 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
     public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
         if (clickType != ClickType.RIGHT) return false;
 
-        if (!player.world.isClient) {
+        if (!player.getWorld().isClient) {
             this.openScreen(stack, player, true);
         }
 
@@ -130,7 +130,7 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
 
     @Override
     public void onEquip(ItemStack stack, SlotReference slot, LivingEntity entity) {
-        if (entity.world.isClient) return;
+        if (entity.getWorld().isClient) return;
 
         entity.playSound(this.type.equipSound(), 1f, 1f);
 

@@ -13,7 +13,7 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.item.Equipment;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContext;
+import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.server.world.ServerWorld;
@@ -37,18 +37,18 @@ public abstract class ZombieEntityMixin extends HostileEntity {
     @Inject(method = "initEquipment", at = @At("TAIL"))
     private void addHeadpacc(Random random, LocalDifficulty localDifficulty, CallbackInfo ci) {
         if (random.nextFloat() > OutTheDoor.CONFIG.zombieBackpackChance() / 100f) return;
-        if (!(this.world instanceof ServerWorld serverWorld)) return;
+        if (!(this.getWorld() instanceof ServerWorld serverWorld)) return;
 
-        var lootTable = serverWorld.getServer().getLootManager().getTable(OutTheDoor.id("gameplay/zombie_backpack"));
+        var lootTable = serverWorld.getServer().getLootManager().getLootTable(OutTheDoor.id("gameplay/zombie_backpack"));
 
-        var context = new LootContext.Builder(serverWorld)
-                .parameter(LootContextParameters.THIS_ENTITY, this)
-                .parameter(LootContextParameters.ORIGIN, this.getPos());
+        var parameterSet = new LootContextParameterSet.Builder(serverWorld)
+                .add(LootContextParameters.THIS_ENTITY, this)
+                .add(LootContextParameters.ORIGIN, this.getPos()).build(LootContextTypes.CHEST);
 
         var backpack = OutTheDoorItems.LEATHER_BACKPACK.getDefaultStack();
         var inventory = OutTheDoorItems.LEATHER_BACKPACK.createTrackedInventory(backpack);
 
-        lootTable.supplyInventory(inventory, context.build(LootContextTypes.CHEST));
+        lootTable.supplyInventory(inventory, parameterSet, 0);
         otd$equipItem(this, backpack);
     }
 

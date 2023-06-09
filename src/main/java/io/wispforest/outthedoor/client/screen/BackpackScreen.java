@@ -1,14 +1,12 @@
 package io.wispforest.outthedoor.client.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.misc.BackpackScreenHandler;
 import io.wispforest.outthedoor.misc.BackpackType;
-import io.wispforest.owo.ui.util.Drawer;
-import io.wispforest.owo.ui.util.OwoNinePatchRenderers;
+import io.wispforest.owo.ui.core.OwoUIDrawContext;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
@@ -39,9 +37,9 @@ public class BackpackScreen extends HandledScreen<BackpackScreenHandler> {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        super.render(matrices, mouseX, mouseY, delta);
-        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+        this.drawMouseoverTooltip(context, mouseX, mouseY);
     }
 
     @Override
@@ -62,16 +60,17 @@ public class BackpackScreen extends HandledScreen<BackpackScreenHandler> {
     }
 
     @Override
-    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-        this.renderBackground(matrices);
-        OwoNinePatchRenderers.LIGHT_PANEL.draw(matrices, this.x, this.y, this.backgroundWidth, this.backgroundHeight);
+    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
+        this.renderBackground(context);
 
-        Drawer.recordQuads();
+        var owoContext = OwoUIDrawContext.of(context);
+        owoContext.drawPanel(this.x, this.y, this.backgroundWidth, this.backgroundHeight, false);
+
+        owoContext.recordQuads();
         for (var slot : this.handler.slots) {
-            Drawer.drawTexture(matrices, this.x + slot.x - 1, this.y + slot.y - 1, 7, 17, 18, 18, 256, 256);
+            owoContext.drawTexture(GENERIC_54_TEXTURE, this.x + slot.x - 1, this.y + slot.y - 1, 7, 17, 18, 18, 256, 256);
         }
 
-        RenderSystem.setShaderTexture(0, GENERIC_54_TEXTURE);
-        Drawer.submitQuads();
+        owoContext.submitQuads();
     }
 }
