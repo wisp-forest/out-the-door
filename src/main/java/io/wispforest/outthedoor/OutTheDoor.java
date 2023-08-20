@@ -1,8 +1,11 @@
 package io.wispforest.outthedoor;
 
+import dev.emi.trinkets.TrinketsNetwork;
+import dev.emi.trinkets.data.EntitySlotLoader;
 import io.wispforest.outthedoor.misc.BackpackScreenHandler;
 import io.wispforest.outthedoor.misc.BackpackType;
 import io.wispforest.outthedoor.misc.OutTheDoorConfig;
+import io.wispforest.outthedoor.mixin.EntitySlotLoaderAccessor;
 import io.wispforest.outthedoor.object.OutTheDoorBackpackTypes;
 import io.wispforest.outthedoor.object.OutTheDoorBlocks;
 import io.wispforest.outthedoor.object.OutTheDoorItems;
@@ -13,6 +16,7 @@ import io.wispforest.owo.registration.reflect.FieldRegistrationHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -45,6 +49,10 @@ public class OutTheDoor implements ModInitializer {
         FieldRegistrationHandler.register(OutTheDoorItems.class, MOD_ID, false);
 
         Registry.register(Registries.SCREEN_HANDLER, id("backpack"), BACKPACK_SCREEN_HANDLER);
+
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            sender.sendPacket(TrinketsNetwork.SYNC_SLOTS, ((EntitySlotLoaderAccessor) EntitySlotLoader.SERVER).otd$getSlotsPacket());
+        });
 
         GROUP.initialize();
     }

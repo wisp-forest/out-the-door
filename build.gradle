@@ -16,7 +16,7 @@ repositories {
     maven { url "https://maven.terraformersmc.com/" }
 
     // cca
-    maven { url "https://ladysnake.jfrog.io/artifactory/mods" }
+    maven { url "https://maven.ladysnake.org/releases" }
 
     // owo
     maven { url "https://maven.wispforest.io" }
