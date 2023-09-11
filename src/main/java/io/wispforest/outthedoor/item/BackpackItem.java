@@ -201,6 +201,8 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
                 });
             }
         });
+
+        serverPlayer.playerScreenHandler.enableSyncing();
     }
 
     public SimpleInventory createTrackedInventory(ItemStack stack) {

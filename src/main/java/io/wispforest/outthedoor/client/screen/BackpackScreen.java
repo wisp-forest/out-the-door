@@ -50,13 +50,6 @@ public class BackpackScreen extends HandledScreen<BackpackScreenHandler> {
         } else {
             super.close();
         }
-
-        // I absolutely detest this fix, but I don't have infinite time to
-        // try and figure out why the inventory desyncs after using a
-        // backpack but *fixes itself* when setting a breakpoint
-        //
-        // glisco, 24.04.2023
-        this.client.interactionManager.clickSlot(this.client.player.playerScreenHandler.syncId, -999, 0, SlotActionType.CLONE, this.client.player);
     }
 
     @Override
