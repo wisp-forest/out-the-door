@@ -2,7 +2,6 @@ package io.wispforest.outthedoor.client.model;
 
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
-import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
@@ -31,7 +30,7 @@ public class BackpackModel implements BakedModel, FabricBakedModel {
 
     @Override
     public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext context) {
-        var data = ((RenderAttachedBlockView) blockView).getBlockEntityRenderAttachment(pos);
+        var data = blockView.getBlockEntityRenderData(pos);
         if (!(data instanceof Identifier modelId)) return;
 
         this.backpackModels.get(modelId).emitBlockQuads(blockView, state, pos, randomSupplier, context);

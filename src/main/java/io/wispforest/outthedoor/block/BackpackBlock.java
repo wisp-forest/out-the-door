@@ -1,5 +1,6 @@
 package io.wispforest.outthedoor.block;
 
+import com.mojang.serialization.MapCodec;
 import dev.emi.trinkets.api.TrinketItem;
 import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.item.BackpackItem;
@@ -26,6 +27,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,7 +41,7 @@ public class BackpackBlock extends HorizontalFacingBlock implements BlockEntityP
     }
 
     @Override
-    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
         return world.getBlockEntity(pos) instanceof BackpackBlockEntity backpack
                 ? BackpackItem.get(backpack.type()).getDefaultStack()
                 : super.getPickStack(world, pos, state);
@@ -110,5 +112,10 @@ public class BackpackBlock extends HorizontalFacingBlock implements BlockEntityP
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new BackpackBlockEntity(pos, state);
+    }
+
+    @Override
+    protected MapCodec<? extends HorizontalFacingBlock> getCodec() {
+        return null;
     }
 }

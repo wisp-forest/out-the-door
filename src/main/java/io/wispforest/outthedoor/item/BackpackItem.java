@@ -11,7 +11,6 @@ import io.wispforest.outthedoor.misc.BackpackType;
 import io.wispforest.outthedoor.misc.OpenBackpackPacket;
 import io.wispforest.outthedoor.object.OutTheDoorBlocks;
 import io.wispforest.owo.itemgroup.OwoItemSettings;
-import io.wispforest.owo.nbt.NbtKey;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -47,7 +46,6 @@ import java.util.*;
 
 public class BackpackItem extends BlockItem implements Trinket, Equipment {
 
-    public static final NbtKey<NbtList> ITEMS_KEY = new NbtKey.ListKey<>("Items", NbtKey.Type.COMPOUND);
     private static final Map<BackpackType, BackpackItem> KNOWN_BACKPACK_ITEMS = new HashMap<>();
 
     public final BackpackType type;
@@ -207,14 +205,14 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
 
     public SimpleInventory createTrackedInventory(ItemStack stack) {
         var inventory = new SimpleInventory(this.type.slots());
-        Inventories.readNbt(stack.getOrCreateNbt(), inventory.stacks);
+        Inventories.readNbt(stack.getOrCreateNbt(), inventory.heldStacks);
 
         inventory.addListener(sender -> storeInventory(stack, inventory));
         return inventory;
     }
 
     public void storeInventory(ItemStack stack, SimpleInventory inventory) {
-        Inventories.writeNbt(stack.getOrCreateNbt(), inventory.stacks, true);
+        Inventories.writeNbt(stack.getOrCreateNbt(), inventory.heldStacks, true);
     }
 
     public static BackpackItem get(BackpackType type) {

@@ -3,9 +3,10 @@ package io.wispforest.outthedoor.block;
 import io.wispforest.outthedoor.item.BackpackItem;
 import io.wispforest.outthedoor.misc.BackpackType;
 import io.wispforest.outthedoor.object.OutTheDoorBlocks;
-import io.wispforest.owo.nbt.NbtKey;
 import io.wispforest.owo.ops.WorldOps;
-import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
+import io.wispforest.owo.serialization.endec.BuiltInEndecs;
+import io.wispforest.owo.serialization.endec.KeyedEndec;
+import net.fabricmc.fabric.api.blockview.v2.RenderDataBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.BlockState;
@@ -19,10 +20,9 @@ import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("UnstableApiUsage")
-public class BackpackBlockEntity extends BlockEntity implements RenderAttachmentBlockEntity {
+public class BackpackBlockEntity extends BlockEntity implements RenderDataBlockEntity {
 
-    public static final NbtKey<ItemStack> BACKPACK = new NbtKey<>("Backpack", NbtKey.Type.ITEM_STACK);
+    public static final KeyedEndec<ItemStack> BACKPACK = BuiltInEndecs.ITEM_STACK.keyed("Backpack", ItemStack.EMPTY);
 
     private ItemStack backpack = ItemStack.EMPTY;
     private SimpleInventory inventory = new SimpleInventory(0);
@@ -93,7 +93,7 @@ public class BackpackBlockEntity extends BlockEntity implements RenderAttachment
     }
 
     @Override
-    public @Nullable Object getRenderAttachmentData() {
+    public @Nullable Object getRenderData() {
         return this.backpack.getItem() instanceof BackpackItem backpackItem
                 ? backpackItem.type.model()
                 : null;

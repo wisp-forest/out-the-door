@@ -54,8 +54,6 @@ public class BackpackScreen extends HandledScreen<BackpackScreenHandler> {
 
     @Override
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        this.renderBackground(context);
-
         var owoContext = OwoUIDrawContext.of(context);
         owoContext.drawPanel(this.x, this.y, this.backgroundWidth, this.backgroundHeight, false);
 
