@@ -3,6 +3,9 @@ package io.wispforest.outthedoor.item;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.Trinket;
 import dev.emi.trinkets.api.TrinketsApi;
+import io.wispforest.endec.Endec;
+import io.wispforest.endec.StructEndec;
+import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.block.BackpackBlockEntity;
 import io.wispforest.outthedoor.misc.BackpackScreenHandler;
@@ -10,27 +13,27 @@ import io.wispforest.outthedoor.misc.BackpackTooltipData;
 import io.wispforest.outthedoor.misc.BackpackType;
 import io.wispforest.outthedoor.misc.OpenBackpackPacket;
 import io.wispforest.outthedoor.object.OutTheDoorBlocks;
-import io.wispforest.owo.itemgroup.OwoItemSettings;
+import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.client.item.TooltipData;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Equipment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.item.tooltip.TooltipData;
+import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -52,10 +55,10 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
 
     public BackpackItem(BackpackType type) {
         super(
-                OutTheDoorBlocks.BACKPACK,
-                new OwoItemSettings()
-                        .group(OutTheDoor.GROUP)
-                        .maxCount(1)
+            OutTheDoorBlocks.BACKPACK,
+            new Settings()
+                .group(OutTheDoor.GROUP)
+                .maxCount(1)
 //                        .equipmentSlot(stack -> EquipmentSlot.HEAD)
         );
 
@@ -112,7 +115,7 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
 
     @Nullable
     @Override
-    public SoundEvent getEquipSound() {
+    public RegistryEntry<SoundEvent> getEquipSound() {
         return this.type.equipSound();
     }
 
@@ -130,19 +133,18 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
     public void onEquip(ItemStack stack, SlotReference slot, LivingEntity entity) {
         if (entity.getWorld().isClient) return;
 
-        entity.playSound(this.type.equipSound(), 1f, 1f);
+        entity.playSound(this.type.equipSound().value(), 1f, 1f);
 
         if (entity instanceof PlayerEntity player) {
-            player.playSound(this.type.equipSound(), player.getSoundCategory(), 1f, 1f);
+            player.playSound(this.type.equipSound().value(), 1f, 1f);
         }
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        super.appendTooltip(stack, world, tooltip, context);
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        super.appendTooltip(stack, context, tooltip, type);
 
-        if (!OutTheDoor.CONFIG.alwaysDisplayContents() && (!Screen.hasShiftDown() && stack.hasNbt() && stack.getNbt().get("Items") instanceof NbtList items && !items.isEmpty())) {
+        if (!OutTheDoor.CONFIG.alwaysDisplayContents() && (!Screen.hasShiftDown() && stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).streamNonEmpty().count() > 0)) {
             tooltip.add(Text.translatable("item.out-the-door.backpack.tooltip.view_contents"));
         }
 
@@ -155,11 +157,11 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
     public Optional<TooltipData> getTooltipData(ItemStack stack) {
         if (!OutTheDoor.CONFIG.alwaysDisplayContents() && !Screen.hasShiftDown()) return super.getTooltipData(stack);
 
-        var stacks = DefaultedList.ofSize(this.type.slots(), ItemStack.EMPTY);
-        Inventories.readNbt(stack.getOrCreateNbt(), stacks);
+        var containerData = stack.get(DataComponentTypes.CONTAINER);
+        if (containerData == null) return Optional.empty();
 
         return Optional.of(new BackpackTooltipData(
-                Util.make(DefaultedList.of(), displayStacks -> stacks.stream().filter($ -> !$.isEmpty()).forEach(displayStacks::add))
+            Util.make(DefaultedList.of(), displayStacks -> containerData.stream().filter($ -> !$.isEmpty()).forEach(displayStacks::add))
         ));
     }
 
@@ -176,11 +178,10 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
         if (!(player instanceof ServerPlayerEntity serverPlayer)) return;
 
         serverPlayer.onHandledScreenClosed();
-        serverPlayer.openHandledScreen(new ExtendedScreenHandlerFactory() {
+        serverPlayer.openHandledScreen(new ExtendedScreenHandlerFactory<ScreenData>() {
             @Override
-            public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-                buf.writeRegistryValue(OutTheDoor.BACKPACK_REGISTRY, BackpackItem.this.type);
-                buf.writeBoolean(restoreParent);
+            public ScreenData getScreenOpeningData(ServerPlayerEntity player) {
+                return new ScreenData(BackpackItem.this.type, restoreParent);
             }
 
             @Override
@@ -205,14 +206,16 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
 
     public SimpleInventory createTrackedInventory(ItemStack stack) {
         var inventory = new SimpleInventory(this.type.slots());
-        Inventories.readNbt(stack.getOrCreateNbt(), inventory.heldStacks);
+
+        var container = stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT);
+        container.copyTo(inventory.heldStacks);
 
         inventory.addListener(sender -> storeInventory(stack, inventory));
         return inventory;
     }
 
     public void storeInventory(ItemStack stack, SimpleInventory inventory) {
-        Inventories.writeNbt(stack.getOrCreateNbt(), inventory.heldStacks, true);
+        stack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(inventory.heldStacks));
     }
 
     public static BackpackItem get(BackpackType type) {
@@ -235,5 +238,13 @@ public class BackpackItem extends BlockItem implements Trinket, Equipment {
                 }
             });
         });
+    }
+
+    public record ScreenData(BackpackType type, boolean restoreParent) {
+        public static final StructEndec<ScreenData> ENDEC = StructEndecBuilder.of(
+            MinecraftEndecs.ofRegistry(OutTheDoor.BACKPACK_REGISTRY).fieldOf("type", ScreenData::type),
+            Endec.BOOLEAN.fieldOf("restore_parent", ScreenData::restoreParent),
+            ScreenData::new
+        );
     }
 }

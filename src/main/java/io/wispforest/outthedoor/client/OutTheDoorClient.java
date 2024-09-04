@@ -14,7 +14,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
@@ -39,12 +39,14 @@ public class OutTheDoorClient implements ClientModInitializer {
     public void onInitializeClient() {
         BlockRenderLayerMap.INSTANCE.putBlock(OutTheDoorBlocks.BACKPACK, RenderLayer.getCutout());
 
-        ModelLoadingRegistry.INSTANCE.registerResourceProvider(resourceManager -> (resourceId, context) -> {
-            if (resourceId.equals(OutTheDoor.id("block/backpack"))) {
-                return new BackpackUnbakedModel();
-            } else {
-                return null;
-            }
+        ModelLoadingPlugin.register(pluginContext -> {
+            pluginContext.resolveModel().register(context -> {
+                if (OutTheDoor.id("block/backpack").equals(context.id())) {
+                    return new BackpackUnbakedModel();
+                } else {
+                    return null;
+                }
+            });
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

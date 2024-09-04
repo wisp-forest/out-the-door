@@ -13,6 +13,7 @@
   "contact": {},
   "license": "MIT",
   "icon": "assets/out-the-door/icon.png",
+  "accessWidener": "outthedoor.accesswidener",
   "environment": "*",
   "entrypoints": {
     "client": [
@@ -28,8 +29,8 @@
   "depends": {
     "fabricloader": ">=0.14.13",
     "fabric": "*",
-    "minecraft": "~1.20",
-    "owo-lib": ">=0.10.0",
+    "minecraft": "~1.21",
+    "owo-lib": ">=0.12.12",
     "trinkets": ">=3.5.0"
   }
 }

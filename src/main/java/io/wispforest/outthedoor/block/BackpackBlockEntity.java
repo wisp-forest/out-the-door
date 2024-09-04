@@ -1,11 +1,11 @@
 package io.wispforest.outthedoor.block;
 
+import io.wispforest.endec.impl.KeyedEndec;
 import io.wispforest.outthedoor.item.BackpackItem;
 import io.wispforest.outthedoor.misc.BackpackType;
 import io.wispforest.outthedoor.object.OutTheDoorBlocks;
 import io.wispforest.owo.ops.WorldOps;
-import io.wispforest.owo.serialization.endec.BuiltInEndecs;
-import io.wispforest.owo.serialization.endec.KeyedEndec;
+import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import net.fabricmc.fabric.api.blockview.v2.RenderDataBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
@@ -17,12 +17,13 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
 public class BackpackBlockEntity extends BlockEntity implements RenderDataBlockEntity {
 
-    public static final KeyedEndec<ItemStack> BACKPACK = BuiltInEndecs.ITEM_STACK.keyed("Backpack", ItemStack.EMPTY);
+    public static final KeyedEndec<ItemStack> BACKPACK = MinecraftEndecs.ITEM_STACK.keyed("Backpack", ItemStack.EMPTY);
 
     private ItemStack backpack = ItemStack.EMPTY;
     private SimpleInventory inventory = new SimpleInventory(0);
@@ -37,8 +38,8 @@ public class BackpackBlockEntity extends BlockEntity implements RenderDataBlockE
 
     public BackpackType type() {
         return this.hasBackpack()
-                ? ((BackpackItem) this.backpack.getItem()).type
-                : null;
+            ? ((BackpackItem) this.backpack.getItem()).type
+            : null;
     }
 
     public SimpleInventory inventory() {
@@ -50,21 +51,21 @@ public class BackpackBlockEntity extends BlockEntity implements RenderDataBlockE
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
-        this.setBackpack(nbt.get(BACKPACK));
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
+        super.readNbt(nbt, registries);
+        this.setBackpack(ItemStack.fromNbtOrEmpty(registries, nbt.getCompound(BACKPACK.key())));
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
-        nbt.put(BACKPACK, this.backpack);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
+        super.writeNbt(nbt, registries);
+        nbt.put(BACKPACK.key(), this.backpack.encode(registries));
     }
 
     @Override
-    public NbtCompound toInitialChunkDataNbt() {
-        var nbt = super.toInitialChunkDataNbt();
-        this.writeNbt(nbt);
+    public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registries) {
+        var nbt = super.toInitialChunkDataNbt(registries);
+        this.writeNbt(nbt, registries);
         return nbt;
     }
 
@@ -95,8 +96,8 @@ public class BackpackBlockEntity extends BlockEntity implements RenderDataBlockE
     @Override
     public @Nullable Object getRenderData() {
         return this.backpack.getItem() instanceof BackpackItem backpackItem
-                ? backpackItem.type.model()
-                : null;
+            ? backpackItem.type.model()
+            : null;
     }
 
     static {

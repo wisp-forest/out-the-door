@@ -9,13 +9,12 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
-import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class BackpackScreen extends HandledScreen<BackpackScreenHandler> {
 
-    public static final Identifier GENERIC_54_TEXTURE = new Identifier("textures/gui/container/generic_54.png");
+    public static final Identifier GENERIC_54_TEXTURE = Identifier.of("textures/gui/container/generic_54.png");
 
     public static final int PLAYER_INVENTORY_HEIGHT = 76;
     public static final int SEPARATOR_HEIGHT = 14;

@@ -29,10 +29,8 @@ public class BackpackUnbakedModel implements UnbakedModel {
         });
     }
 
-    @Nullable
     @Override
-    @SuppressWarnings("DataFlowIssue")
-    public BakedModel bake(Baker baker, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings bakeSettings, Identifier modelId) {
+    public @Nullable BakedModel bake(Baker baker, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings bakeSettings) {
         var models = ImmutableMap.<Identifier, BakedModel>builder();
 
         for (var backpackType : OutTheDoor.BACKPACK_REGISTRY) {

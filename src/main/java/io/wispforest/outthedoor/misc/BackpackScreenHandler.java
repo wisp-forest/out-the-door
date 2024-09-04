@@ -11,7 +11,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -25,11 +24,8 @@ public class BackpackScreenHandler extends ScreenHandler {
     protected final SimpleInventory backpackInventory;
     protected final Predicate<PlayerEntity> canUse;
 
-    public static BackpackScreenHandler client(int syncId, PlayerInventory playerInventory, PacketByteBuf data) {
-        var type = data.readRegistryValue(OutTheDoor.BACKPACK_REGISTRY);
-        var restoreParent = data.readBoolean();
-
-        return new BackpackScreenHandler(syncId, playerInventory, new SimpleInventory(type.slots()), type, player -> true, restoreParent);
+    public static BackpackScreenHandler client(int syncId, PlayerInventory playerInventory, BackpackItem.ScreenData data) {
+        return new BackpackScreenHandler(syncId, playerInventory, new SimpleInventory(data.type().slots()), data.type(), player -> true, data.restoreParent());
     }
 
     public BackpackScreenHandler(int syncId, PlayerInventory playerInventory, SimpleInventory backpackInventory, BackpackType type, Predicate<PlayerEntity> canUse) {
@@ -45,7 +41,7 @@ public class BackpackScreenHandler extends ScreenHandler {
 
         if (playerInventory.player instanceof ServerPlayerEntity player) {
             player.playSound(type.openSound(), 1f, 1f);
-            player.playSound(type.openSound(), player.getSoundCategory(), 1f, 1f);
+            player.playSound(type.openSound(), 1f, 1f);
         }
 
         SlotGenerator.begin(this::addSlot, BackpackScreen.SIDE_PADDING + Math.max(0, (9 - type.rowWidth()) * 18 / 2) + 1, BackpackScreen.TOP_PADDING + 1)

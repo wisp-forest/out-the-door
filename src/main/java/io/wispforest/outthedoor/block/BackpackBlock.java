@@ -2,7 +2,6 @@ package io.wispforest.outthedoor.block;
 
 import com.mojang.serialization.MapCodec;
 import dev.emi.trinkets.api.TrinketItem;
-import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.item.BackpackItem;
 import io.wispforest.outthedoor.misc.BackpackScreenHandler;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -13,13 +12,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -64,18 +61,17 @@ public class BackpackBlock extends HorizontalFacingBlock implements BlockEntityP
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (world.getBlockEntity(pos) instanceof BackpackBlockEntity backpack && backpack.hasBackpack()) {
             if (!world.isClient) {
                 if (player.isSneaking()) {
                     if (!TrinketItem.equipItem(player, backpack.backpack())) return ActionResult.PASS;
                     world.removeBlock(pos, false);
                 } else {
-                    player.openHandledScreen(new ExtendedScreenHandlerFactory() {
+                    player.openHandledScreen(new ExtendedScreenHandlerFactory<BackpackItem.ScreenData>() {
                         @Override
-                        public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-                            buf.writeRegistryValue(OutTheDoor.BACKPACK_REGISTRY, backpack.type());
-                            buf.writeBoolean(false);
+                        public BackpackItem.ScreenData getScreenOpeningData(ServerPlayerEntity player) {
+                            return new BackpackItem.ScreenData(backpack.type(), false);
                         }
 
                         @Override

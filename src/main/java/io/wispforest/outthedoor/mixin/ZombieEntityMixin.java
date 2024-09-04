@@ -1,21 +1,20 @@
 package io.wispforest.outthedoor.mixin;
 
 import dev.emi.trinkets.TrinketSlot;
-import dev.emi.trinkets.api.SlotReference;
-import dev.emi.trinkets.api.TrinketComponent;
-import dev.emi.trinkets.api.TrinketInventory;
-import dev.emi.trinkets.api.TrinketsApi;
+import dev.emi.trinkets.api.*;
 import io.wispforest.outthedoor.OutTheDoor;
 import io.wispforest.outthedoor.object.OutTheDoorItems;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.ZombieEntity;
-import net.minecraft.item.Equipment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.random.Random;
@@ -39,7 +38,7 @@ public abstract class ZombieEntityMixin extends HostileEntity {
         if (random.nextFloat() > OutTheDoor.CONFIG.zombieBackpackChance() / 100f) return;
         if (!(this.getWorld() instanceof ServerWorld serverWorld)) return;
 
-        var lootTable = serverWorld.getServer().getLootManager().getLootTable(OutTheDoor.id("gameplay/zombie_backpack"));
+        var lootTable = serverWorld.getServer().getReloadableRegistries().getLootTable(RegistryKey.of(RegistryKeys.LOOT_TABLE, OutTheDoor.id("gameplay/zombie_backpack")));
 
         var parameterSet = new LootContextParameterSet.Builder(serverWorld)
                 .add(LootContextParameters.THIS_ENTITY, this)
@@ -66,10 +65,11 @@ public abstract class ZombieEntityMixin extends HostileEntity {
                             if (TrinketSlot.canInsert(stack, ref, user)) {
                                 ItemStack newStack = stack.copy();
                                 inv.setStack(i, newStack);
-                                SoundEvent soundEvent = stack.getItem() instanceof Equipment eq ? eq.getEquipSound() : null;
+                                Trinket trinket = TrinketsApi.getTrinket(stack.getItem());
+                                RegistryEntry<SoundEvent> soundEvent = trinket.getEquipSound(stack, ref, user);
                                 if (!stack.isEmpty() && soundEvent != null) {
                                     user.emitGameEvent(GameEvent.EQUIP);
-                                    user.playSound(soundEvent, 1.0F, 1.0F);
+                                    user.playSound(soundEvent.value(), 1.0F, 1.0F);
                                 }
                                 stack.setCount(0);
                                 return true;

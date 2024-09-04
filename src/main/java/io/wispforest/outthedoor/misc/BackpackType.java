@@ -1,5 +1,6 @@
 package io.wispforest.outthedoor.misc;
 
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -18,7 +19,7 @@ public interface BackpackType {
         return SoundEvents.ITEM_BUNDLE_INSERT;
     }
 
-    default SoundEvent equipSound() {
+    default RegistryEntry<SoundEvent> equipSound() {
         return SoundEvents.ITEM_ARMOR_EQUIP_LEATHER;
     }
 
